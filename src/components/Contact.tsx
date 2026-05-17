@@ -37,7 +37,7 @@ export function Contact() {
              <span className="italic text-[var(--color-text-secondary)]">business.</span>
            </h2>
            <p className="mt-12 text-lg text-[var(--color-text-secondary)] max-w-sm font-sans leading-relaxed">
-             Available for freelance opportunities. Let's build something robust, elegant, and impactful.
+             Available for internships, freelance opportunities, and remote roles. Let's build something robust, elegant, and impactful.
            </p>
            
            <div className="mt-24 font-sans text-sm tracking-[0.1em] uppercase">
