@@ -1,5 +1,6 @@
 import { ArrowUpRight, Github, Instagram, Linkedin, Mail } from "lucide-react";
 import { motion } from "motion/react";
+import { DirectionalLink } from "./DirectionalLink";
 
 const WhatsappIcon = ({ size = 24, strokeWidth = 1.5, className = "" }) => (
   <svg
@@ -95,7 +96,7 @@ export function Contact() {
             </div>
 
             <div className="flex flex-col border-y border-[var(--color-border)]">
-              <a
+              <DirectionalLink
                 href="mailto:dev@bcodes.co.za?subject=Project%20Inquiry%20for%20Blessed&body=Hi%20Blessed%2C%0A%0AI'd%20like%20to%20talk%20about%20a%20project.%0A"
                 className="group flex items-center justify-between py-6 text-[var(--color-text-primary)] border-b border-[var(--color-border)] hover:px-3 transition-all"
               >
@@ -104,9 +105,9 @@ export function Contact() {
                   Email Me
                 </span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={1.5} />
-              </a>
+              </DirectionalLink>
 
-              <a
+              <DirectionalLink
                 href="https://wa.me/263771182657"
                 target="_blank"
                 rel="noreferrer"
@@ -117,9 +118,9 @@ export function Contact() {
                   WhatsApp
                 </span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={1.5} />
-              </a>
+              </DirectionalLink>
 
-              <a
+              <DirectionalLink
                 href="https://www.linkedin.com/in/blessed-nyathi/"
                 target="_blank"
                 rel="noreferrer"
@@ -130,9 +131,9 @@ export function Contact() {
                   LinkedIn
                 </span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={1.5} />
-              </a>
+              </DirectionalLink>
 
-              <a
+              <DirectionalLink
                 href="https://github.com/BlessedOfficial"
                 target="_blank"
                 rel="noreferrer"
@@ -143,7 +144,7 @@ export function Contact() {
                   GitHub
                 </span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" strokeWidth={1.5} />
-              </a>
+              </DirectionalLink>
             </div>
           </div>
         </motion.div>

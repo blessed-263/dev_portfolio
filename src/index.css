@@ -31,6 +31,20 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.directional-link {
+  transform: translate(var(--dir-x, 0px), var(--dir-y, 0px));
+  transition: transform 0.2s ease;
 }
 
