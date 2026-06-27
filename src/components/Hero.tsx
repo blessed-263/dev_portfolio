@@ -1,7 +1,8 @@
 import { motion } from "motion/react";
-import { useRef, useState, type PointerEvent } from "react";
-import { PROJECTS } from "../data/projects";
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { PROJECTS, formatProjectStatus } from "../data/projects";
 import { CountUp } from "./CountUp";
+import { HeroSlideButton } from "./HeroSlideButton";
 
 const HERO_TITLES = ["AMPEX", "YOU & ME AFRICA", "YOU & ME GALLERY"] as const;
 const HERO_PROJECTS = HERO_TITLES.map((title) => PROJECTS.find((p) => p.title === title)).filter(
@@ -11,40 +12,74 @@ const HERO_PROJECTS = HERO_TITLES.map((title) => PROJECTS.find((p) => p.title ==
 export function Hero() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const dragState = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
-  const handleSlide = () => {
+  const updateActiveIndex = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const slides = Array.from(container.children) as HTMLElement[];
-    const currentScroll = container.scrollLeft;
-    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (!slides.length) return;
 
-    if (currentScroll >= maxScroll - 8) {
-      container.scrollTo({ left: 0, behavior: "smooth" });
-      return;
-    }
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let closest = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
 
-    const nextSlidePosition = slides
-      .map((slide) => {
-        const slideRect = slide.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const centeredPosition =
-          currentScroll +
-          slideRect.left -
-          containerRect.left -
-          (container.clientWidth - slideRect.width) / 2;
-
-        return Math.max(0, Math.min(centeredPosition, maxScroll));
-      })
-      .find((position) => position > currentScroll + 24);
-
-    container.scrollTo({
-      left: nextSlidePosition ?? 0,
-      behavior: "smooth",
+    slides.forEach((slide, index) => {
+      const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+      const distance = Math.abs(containerCenter - slideCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = index;
+      }
     });
+
+    setActiveIndex(closest);
+  }, []);
+
+  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const slide = container.children[index] as HTMLElement | undefined;
+    if (!slide) return;
+
+    setActiveIndex(index);
+    slide.scrollIntoView({ behavior, block: "nearest", inline: "center" });
+
+    if (!("onscrollend" in container)) {
+      window.setTimeout(updateActiveIndex, behavior === "smooth" ? 450 : 0);
+    }
+  }, [updateActiveIndex]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      if (dragState.current.active) updateActiveIndex();
+    };
+
+    updateActiveIndex();
+    container.addEventListener("scroll", onScroll, { passive: true });
+    container.addEventListener("scrollend", updateActiveIndex);
+    window.addEventListener("resize", updateActiveIndex);
+
+    return () => {
+      container.removeEventListener("scroll", onScroll);
+      container.removeEventListener("scrollend", updateActiveIndex);
+      window.removeEventListener("resize", updateActiveIndex);
+    };
+  }, [updateActiveIndex]);
+
+  const handleSlide = () => {
+    const nextIndex = (activeIndex + 1) % HERO_PROJECTS.length;
+    scrollToIndex(nextIndex);
   };
+
+  const nextIndex = (activeIndex + 1) % HERO_PROJECTS.length;
+  const nextProject = HERO_PROJECTS[nextIndex];
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     const container = scrollContainerRef.current;
@@ -72,6 +107,7 @@ export function Hero() {
     dragState.current.active = false;
     setIsDragging(false);
     scrollContainerRef.current?.releasePointerCapture(e.pointerId);
+    updateActiveIndex();
   };
 
   return (
@@ -107,19 +143,12 @@ export function Hero() {
         </div>
       </div>
 
-      <motion.button
-        type="button"
-        aria-label="Show next project"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.94 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        onClick={handleSlide}
-        className="hidden lg:flex absolute left-[45%] top-[55%] -translate-x-1/2 -translate-y-1/2 z-30 items-center justify-center w-[100px] h-[100px] rounded-full border border-black/20 backdrop-blur-md bg-white/30 hover:bg-white/50 transition-colors cursor-pointer text-[10px] uppercase tracking-[0.2em]"
-      >
-        Slide
-      </motion.button>
+      <HeroSlideButton
+        activeIndex={activeIndex}
+        total={HERO_PROJECTS.length}
+        nextProject={nextProject}
+        onSlide={handleSlide}
+      />
 
       <div
         ref={scrollContainerRef}
@@ -132,41 +161,75 @@ export function Hero() {
         }`}
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {HERO_PROJECTS.map((project, index) => (
+        {HERO_PROJECTS.map((project, index) => {
+          const isActive = index === activeIndex;
+
+          return (
           <motion.a
             key={project.title}
             href={project.link}
             target="_blank"
             rel="noreferrer"
             initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 + index * 0.2 }}
-            className={`min-w-[280px] md:min-w-[340px] flex flex-col gap-6 snap-center group pb-2 ${
+            animate={{
+              opacity: 1,
+              x: 0,
+              scale: isActive ? 1.05 : 0.96,
+            }}
+            transition={{
+              opacity: { duration: 0.8, delay: 0.2 + index * 0.2 },
+              x: { duration: 0.8, delay: 0.2 + index * 0.2 },
+              scale: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+            }}
+            className={`min-w-[280px] md:min-w-[340px] flex flex-col gap-6 snap-center group pb-2 origin-bottom ${
               index === HERO_PROJECTS.length - 1 ? "pr-12" : ""
-            }`}
+            } ${isActive ? "z-10" : "z-0"}`}
             draggable={false}
           >
-            <div className="aspect-[3/4] w-full border border-[var(--color-border)] overflow-hidden relative">
+            <div
+              className={`aspect-[3/4] w-full border overflow-hidden relative transition-[border-color,box-shadow] duration-500 ${
+                isActive
+                  ? "border-[var(--color-text-primary)] shadow-[0_24px_48px_rgba(0,0,0,0.12)]"
+                  : "border-[var(--color-border)]"
+              }`}
+            >
               <img
                 src={project.image}
                 alt={project.title}
-                className="w-full h-full object-cover grayscale opacity-90 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700 ease-out pointer-events-none"
+                className={`w-full h-full object-cover transition-all duration-700 ease-out pointer-events-none ${
+                  isActive
+                    ? "grayscale-0 opacity-100 scale-105"
+                    : "grayscale opacity-75 group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-90"
+                }`}
               />
-              <span className="absolute top-3 left-3 font-sans text-[10px] uppercase tracking-[0.15em] px-2 py-1 bg-white/80 backdrop-blur-sm border border-[var(--color-border)]">
-                {project.status}
+              <span
+                className={`absolute top-3 left-3 font-sans text-[10px] tracking-[0.15em] px-2 py-1 bg-white/80 backdrop-blur-sm border border-[var(--color-border)] ${
+                  project.status === "CONCEPT" ? "normal-case" : "uppercase"
+                }`}
+              >
+                {formatProjectStatus(project.status)}
               </span>
             </div>
             <div>
-              <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-secondary)] mb-2">
+              <h4
+                className={`font-sans text-[10px] uppercase tracking-[0.2em] mb-2 transition-colors duration-300 ${
+                  isActive ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"
+                }`}
+              >
                 {project.category}
               </h4>
-              <h3 className="font-serif text-2xl md:text-3xl text-[var(--color-text-primary)] mb-1">
+              <h3
+                className={`font-serif text-2xl md:text-3xl mb-1 transition-colors duration-300 ${
+                  isActive ? "text-[var(--color-text-primary)]" : "text-[var(--color-text-primary)]/70"
+                }`}
+              >
                 {project.title}
               </h3>
               <p className="font-serif italic text-sm text-[var(--color-text-secondary)]">— {project.year}</p>
             </div>
           </motion.a>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

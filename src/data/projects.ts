@@ -2,14 +2,29 @@ export type Project = {
   title: string;
   category: string;
   year: string;
-  status: "LIVE" | "PROPOSAL";
+  status: "LIVE" | "PROPOSAL" | "CONCEPT";
   image: string;
   link: string;
   description: string;
   tech: string[];
 };
 
+export function formatProjectStatus(status: Project["status"]): string {
+  return status === "CONCEPT" ? "concept" : status;
+}
+
 export const PROJECTS: Project[] = [
+  {
+    title: "AMALGAMATE",
+    category: "Creative Engineering Studio",
+    year: "2026",
+    status: "CONCEPT",
+    image: "/projects/amalgamate.png",
+    link: "https://amalgamate-gold.vercel.app/",
+    description:
+      "A global creative engineering studio concept — architecting supreme identities across brand architecture, luxury commerce, mobile experience, and strategic insight. The current Vercel preview showcases the vision; the full platform roadmap is planned for implementation.",
+    tech: ["React", "Next.js", "Tailwind CSS", "Supabase", "MedusaJS", "Vercel"],
+  },
   {
     title: "AMPEX",
     category: "Events / Ticketing",

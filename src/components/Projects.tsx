@@ -1,10 +1,20 @@
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { PROJECTS, PROJECT_CATEGORIES, type Project } from "../data/projects";
+import { PROJECTS, PROJECT_CATEGORIES, formatProjectStatus, type Project } from "../data/projects";
 import { CountUp } from "./CountUp";
 
-const STATUS_FILTERS = ["ALL", "LIVE", "PROPOSAL"] as const;
+const STATUS_FILTERS = ["ALL", "LIVE", "CONCEPT", "PROPOSAL"] as const;
+
+function statusBadgeClass(status: Project["status"]) {
+  if (status === "LIVE") {
+    return "bg-[var(--color-text-primary)] text-[var(--color-bg)]";
+  }
+  if (status === "CONCEPT") {
+    return "border border-dashed border-[var(--color-text-primary)] text-[var(--color-text-primary)] bg-black/[0.03]";
+  }
+  return "border border-[var(--color-border)] text-[var(--color-text-secondary)]";
+}
 
 export function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -66,13 +76,15 @@ export function Projects() {
               key={status}
               type="button"
               onClick={() => setStatusFilter(status)}
-              className={`font-sans text-[10px] uppercase tracking-[0.15em] px-4 py-2 border transition-colors ${
+              className={`font-sans text-[10px] tracking-[0.15em] px-4 py-2 border transition-colors ${
+                status === "CONCEPT" ? "normal-case" : "uppercase"
+              } ${
                 statusFilter === status
                   ? "bg-[var(--color-text-primary)] text-[var(--color-bg)] border-[var(--color-text-primary)]"
                   : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]"
               }`}
             >
-              {status}
+              {status === "CONCEPT" ? "concept" : status}
             </button>
           ))}
         </div>
@@ -124,13 +136,11 @@ export function Projects() {
                       {project.category}
                     </span>
                     <span
-                      className={`font-sans text-[10px] uppercase tracking-[0.15em] px-2 py-1 ${
-                        project.status === "LIVE"
-                          ? "bg-[var(--color-text-primary)] text-[var(--color-bg)]"
-                          : "border border-[var(--color-border)] text-[var(--color-text-secondary)]"
+                      className={`font-sans text-[10px] tracking-[0.15em] px-2 py-1 ${statusBadgeClass(project.status)} ${
+                        project.status === "CONCEPT" ? "normal-case" : "uppercase"
                       }`}
                     >
-                      {project.status}
+                      {formatProjectStatus(project.status)}
                     </span>
                   </div>
 
@@ -208,8 +218,12 @@ export function Projects() {
               </div>
 
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-secondary)] mb-4">
-                  {selectedProject.status} — {selectedProject.year}
+                <div
+                  className={`font-sans text-[10px] tracking-[0.2em] text-[var(--color-text-secondary)] mb-4 ${
+                    selectedProject.status === "CONCEPT" ? "normal-case" : "uppercase"
+                  }`}
+                >
+                  {formatProjectStatus(selectedProject.status)} — {selectedProject.year}
                 </div>
 
                 <h2 className="font-serif text-3xl md:text-5xl tracking-tighter mb-2">

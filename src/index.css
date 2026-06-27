@@ -63,3 +63,33 @@ html.lenis body {
   transition: transform 0.2s ease;
 }
 
+.hero-slide-btn {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 12px 28px rgba(0, 0, 0, 0.1);
+}
+
+.hero-slide-ring {
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  border: 1px dashed rgba(17, 17, 17, 0.16);
+  animation: hero-slide-spin 18s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes hero-slide-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-ring {
+    animation: none;
+  }
+}
+
