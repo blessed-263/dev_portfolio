@@ -11,40 +11,8 @@ import { Skills } from "../components/Skills";
 import { Projects } from "../components/Projects";
 import { Contact } from "../components/Contact";
 import { ScrollProgress } from "../components/ScrollProgress";
+import { LandingIntro, INTRO_DURATION_MS, INTRO_HANDOFF_DELAY_S } from "../components/LandingIntro";
 import { useLenis } from "../hooks/useLenis";
-
-function LandingIntro() {
-  const ease = [0.22, 1, 0.36, 1] as const;
-
-  return (
-    <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.55, ease: "easeInOut" } }}
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-[var(--color-bg)] text-[var(--color-text-primary)]"
-      aria-hidden
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease }}
-        className="flex flex-col items-center gap-5"
-      >
-        <span className="font-mono text-3xl md:text-4xl font-medium tracking-tight">
-          &lt;/&gt;
-        </span>
-        <span className="font-serif text-4xl md:text-5xl tracking-tighter lowercase">
-          bcodes.
-        </span>
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.5, delay: 0.15, ease }}
-          className="mt-1 h-px w-12 origin-center bg-[var(--color-text-primary)]/20"
-        />
-      </motion.div>
-    </motion.div>
-  );
-}
 
 export default function PortfolioPage() {
   const [showIntro, setShowIntro] = useState(() => {
@@ -62,18 +30,24 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     if (!showIntro) return;
-    const timeout = window.setTimeout(() => setShowIntro(false), 1400);
+    const timeout = window.setTimeout(() => setShowIntro(false), INTRO_DURATION_MS);
     return () => window.clearTimeout(timeout);
   }, [showIntro]);
 
+  const ease = [0.22, 1, 0.36, 1] as const;
+
   return (
     <motion.div className="min-h-screen bg-[#e5e5e5] p-2 md:p-4 lg:p-6">
-      <ScrollProgress />
-      <AnimatePresence>{showIntro && <LandingIntro />}</AnimatePresence>
+      {!showIntro && <ScrollProgress />}
+      <AnimatePresence mode="wait">{showIntro && <LandingIntro />}</AnimatePresence>
       <motion.div
         initial={showIntro ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: showIntro ? 0.35 : 0, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          duration: 0.35,
+          delay: showIntro ? INTRO_HANDOFF_DELAY_S : 0,
+          ease,
+        }}
         className="relative w-full bg-[var(--color-bg)] rounded-[1rem] md:rounded-[2rem] overflow-hidden bg-noise shadow-2xl border border-white/50 max-w-[1800px] mx-auto"
       >
         <Navbar />

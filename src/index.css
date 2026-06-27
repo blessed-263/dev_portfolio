@@ -43,6 +43,21 @@ html.lenis body {
   scroll-behavior: auto !important;
 }
 
+.landing-intro-card {
+  will-change: clip-path, transform;
+}
+
+.landing-intro-shell {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-intro-card,
+  .landing-intro-shell {
+    will-change: auto;
+  }
+}
+
 .directional-link {
   transform: translate(var(--dir-x, 0px), var(--dir-y, 0px));
   transition: transform 0.2s ease;

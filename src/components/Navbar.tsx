@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DirectionalLink } from "./DirectionalLink";
+import { InfoQuote } from "./InfoQuote";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -23,24 +24,28 @@ export function Navbar() {
         <DirectionalLink href="#">blessed</DirectionalLink>
       </div>
 
-      <div className="hidden md:flex gap-12 font-sans text-[10px] uppercase tracking-[0.1em] font-medium">
-        <DirectionalLink href="#projects" className="hover:opacity-60 transition-opacity">
+      <div className="flex items-center gap-3 md:gap-4">
+        <div className="hidden md:flex gap-12 font-sans text-[10px] uppercase tracking-[0.1em] font-medium">
+          <DirectionalLink href="#projects" className="hover:opacity-60 transition-opacity">
+            Work
+          </DirectionalLink>
+          <DirectionalLink href="#skills" className="hover:opacity-60 transition-opacity">
+            Expertise
+          </DirectionalLink>
+          <DirectionalLink href="#contact" className="hover:opacity-60 transition-opacity">
+            Contact
+          </DirectionalLink>
+        </div>
+
+        <InfoQuote />
+
+        <DirectionalLink
+          href="#projects"
+          className="md:hidden font-sans text-[10px] uppercase tracking-[0.15em] border border-[var(--color-border)] px-3 py-2"
+        >
           Work
         </DirectionalLink>
-        <DirectionalLink href="#skills" className="hover:opacity-60 transition-opacity">
-          Expertise
-        </DirectionalLink>
-        <DirectionalLink href="#contact" className="hover:opacity-60 transition-opacity">
-          Contact
-        </DirectionalLink>
       </div>
-
-      <DirectionalLink
-        href="#projects"
-        className="md:hidden font-sans text-[10px] uppercase tracking-[0.15em] border border-[var(--color-border)] px-3 py-2"
-      >
-        Work
-      </DirectionalLink>
     </nav>
   );
 }

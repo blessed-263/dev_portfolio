@@ -1,4 +1,4 @@
-import { Briefcase, GraduationCap, Languages, Sparkles } from "lucide-react";
+import { Briefcase, GraduationCap, Languages } from "lucide-react";
 import {
   CERTIFICATIONS,
   CV_EXPERIENCE,
@@ -47,10 +47,7 @@ export function SkillsMatrix() {
   return (
     <div className="gh-card">
       <div className="gh-card-header">
-        <span>
-          <Sparkles size={16} style={{ display: "inline", marginRight: 6, verticalAlign: "text-bottom" }} />
-          Technical Skills
-        </span>
+        <span>Technical Skills</span>
       </div>
       <div className="gh-card-body gh-skills-grid">
         {SKILL_CATEGORIES.map((group) => (
